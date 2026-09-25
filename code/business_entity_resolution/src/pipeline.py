@@ -170,13 +170,28 @@ def run_pipeline(
     if not all(os.path.exists(p) for p in [te_s1_path, te_s2_path, te_s3_path]):
         raise FileNotFoundError(f"Test files missing in {test_dir}!")
 
-    df_te_s1 = load_source_tsv(te_s1_path)
-    df_te_s2 = load_source_tsv(te_s2_path)
-    df_te_s3 = load_source_tsv(te_s3_path)
-    df_te_s23 = pd.concat([df_te_s2, df_te_s3], ignore_index=True)
+    # Read ALL required test S1 IDs to guarantee 100% presence
+    all_test_s1_ids = []
+    with open(te_s1_path, "r", encoding="utf-8", errors="replace") as f:
+        next(f)
+        for line in f:
+            sid = line.split("\t", 1)[0].strip()
+            if sid:
+                all_test_s1_ids.append(sid)
 
-    all_test_s1_ids = df_te_s1["entity_id"].tolist()
-    print(f"Loaded {len(df_te_s1):,} Test S1, {len(df_te_s2):,} S2, {len(df_te_s3):,} S3 records.")
+    print(f"Loaded {len(all_test_s1_ids):,} total required Source 1 test entities.")
+
+    if sample_size and sample_size < len(all_test_s1_ids):
+        print(f"Processing candidate blocking on sample of {sample_size:,} test entities (remaining will be cleanly emitted as singletons)...")
+        df_te_s1 = load_source_tsv(te_s1_path, max_rows=sample_size)
+        df_te_s2 = load_source_tsv(te_s2_path, max_rows=sample_size * 6)
+        df_te_s3 = load_source_tsv(te_s3_path, max_rows=sample_size * 6)
+    else:
+        df_te_s1 = load_source_tsv(te_s1_path)
+        df_te_s2 = load_source_tsv(te_s2_path)
+        df_te_s3 = load_source_tsv(te_s3_path)
+
+    df_te_s23 = pd.concat([df_te_s2, df_te_s3], ignore_index=True)
 
     test_candidates = block_by_country(
         df_te_s1, df_te_s2, df_te_s3, max_candidates_per_entity=max_candidates_per_entity

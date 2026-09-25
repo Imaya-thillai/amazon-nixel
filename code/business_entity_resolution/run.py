@@ -24,6 +24,8 @@ from pipeline import run_pipeline
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(line_buffering=True)
     parser = argparse.ArgumentParser(
         description="Amazon ML Challenge 2026: Business Entity Resolution"
     )
@@ -48,8 +50,8 @@ def main():
     parser.add_argument(
         "--sample-size",
         type=int,
-        default=None,
-        help="Optional: number of Source 1 entities to sample for quick benchmarking",
+        default=5000,
+        help="Number of Source 1 entities to sample for training & inference (default: 5000 for fast, memory-safe execution; pass 0 for full 2.2M dataset)",
     )
     parser.add_argument(
         "--max-candidates",
