@@ -1,7 +1,7 @@
 # ML Challenge 2026: Business Entity Resolution Solution Document
 
 **Team Name:** NIXEL  
-**Team Members:** Imaya Thillai, Jeffrey Ryan  
+**Team Members:** Imaya Thillai, Jeffrey Ryan, Anitha Vanitha  
 **Submission Date:** September 2026  
 
 ---
@@ -122,3 +122,15 @@ python code/business_entity_resolution/run.py \
     --test-dir student_resource/dataset/test \
     --output-dir output
 ```
+
+### B. Open-Source Licensing & Parameter Audit
+Every algorithmic and model component strictly complies with the competition constraints (MIT / Apache-2.0 / BSD-3, $\le 8\text{B}$ parameters, offline execution):
+
+| Component / Subsystem | Implementation / Source | License Type | Parameter Count | Offline & Self-Contained |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ensemble Classifier** | `HistGradientBoostingClassifier` (scikit-learn) | BSD-3 (MIT-compatible) | $<0.001\text{B}$ params | Yes (100% Offline) |
+| **Candidate Blocking** | Sparse `TfidfVectorizer` (scikit-learn) | BSD-3 (MIT-compatible) | $0\text{B}$ (Linear sparse) | Yes (100% Offline) |
+| **Feature Engineering** | `difflib.SequenceMatcher` / `unicodedata` | Python PSF (MIT-compatible) | $0\text{B}$ (Deterministic) | Yes (100% Offline) |
+| **Sparse Matrix Algebra** | `scipy.sparse` (SciPy) | BSD-3 (MIT-compatible) | $0\text{B}$ (Math library) | Yes (100% Offline) |
+| **Submission Pipeline** | Team NIXEL Proprietary Pipeline | MIT License | $0\text{B}$ (Clean Python) | Yes (100% Offline) |
+

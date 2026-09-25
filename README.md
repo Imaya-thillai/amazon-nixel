@@ -11,7 +11,7 @@
 
 <br/>
 
-**Team:** `NIXEL` &nbsp;|&nbsp; **Author:** [Imaya Thillai](https://github.com/Imaya-thillai) &nbsp;|&nbsp; **Target Jurisdictions:** United States, India, France
+**Team:** `NIXEL` &nbsp;|&nbsp; **Contributors:** [Imaya Thillai](https://github.com/Imaya-thillai), Jeffrey Ryan, Anitha Vanitha &nbsp;|&nbsp; **Target Jurisdictions:** United States, India, France
 
 <br/>
 
@@ -250,7 +250,17 @@ PASS — no blocking issues found. Safe to submit.
 
 ## ⚖️ License & Fair-Play Compliance
 
-- **Permissive Open Source:** All models, libraries, and code are distributed under the **MIT / BSD-3** licenses.
+Every component in this repository is distributed under the permissive [MIT License](LICENSE) and complies strictly with the Amazon ML Challenge 2026 rules:
+
+| Component / Subsystem | Implementation / Source | License Type | Parameter Count | Offline Execution |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ensemble Classifier** | `HistGradientBoostingClassifier` (scikit-learn) | BSD-3 (MIT-compatible) | $<0.001\text{B}$ params | ✅ 100% Offline |
+| **Candidate Blocking** | Sparse `TfidfVectorizer` (scikit-learn) | BSD-3 (MIT-compatible) | $0\text{B}$ (Linear sparse) | ✅ 100% Offline |
+| **Feature Engineering** | `difflib.SequenceMatcher` / `unicodedata` | Python PSF (MIT-compatible) | $0\text{B}$ (Deterministic) | ✅ 100% Offline |
+| **Sparse Matrix Algebra** | `scipy.sparse` (SciPy) | BSD-3 (MIT-compatible) | $0\text{B}$ (Math library) | ✅ 100% Offline |
+| **Submission Pipeline** | Team NIXEL Proprietary Pipeline | MIT License | $0\text{B}$ (Clean Python) | ✅ 100% Offline |
+
+- **Permissive Open Source:** All models, libraries, and code are distributed under the [MIT License](LICENSE).
 - **Model Constraints:** Zero models exceed the $\le 8\text{B}$ parameter threshold; inference operates $100\%$ offline on standard CPU/GPU compute.
 - **No External Data:** Zero web scraping, external geocoding, or external entity-resolution APIs were utilized.
 
@@ -259,6 +269,6 @@ PASS — no blocking issues found. Safe to submit.
 <div align="center">
 
 Developed with ❤️ for the **Amazon ML Challenge 2026** by **Team NIXEL**  
-*Maintained by [Imaya Thillai](https://github.com/Imaya-thillai)*
+*Maintained by [Imaya Thillai](https://github.com/Imaya-thillai), Jeffrey Ryan, and Anitha Vanitha*
 
 </div>
