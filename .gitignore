@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Large Dataset files & Zip archives (exceed GitHub 100MB limit)
+*.zip
+*.tar
+*.tar.gz
+*.crdownload
+*.bin
+student_resource/dataset/
+dataset/
+sample_output/
+output/
+__MACOSX/
+.DS_Store
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
