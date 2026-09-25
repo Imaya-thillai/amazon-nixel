@@ -59,16 +59,35 @@ def run_pipeline(
             f"train_source2.tsv, train_source3.tsv, and train_ground_truth.tsv exist."
         )
 
-    df_tr_s1 = load_source_tsv(tr_s1_path)
-    df_tr_s2 = load_source_tsv(tr_s2_path)
-    df_tr_s3 = load_source_tsv(tr_s3_path)
-    gt_mapping = load_ground_truth_tsv(tr_gt_path)
-
-    if sample_size and sample_size < len(df_tr_s1):
-        print(f"Sampling training set to {sample_size} Source 1 entities for fast run...")
-        df_tr_s1 = df_tr_s1.iloc[:sample_size].copy()
+    if sample_size:
+        print(f"Sampling training set to {sample_size:,} Source 1 entities for fast, memory-safe execution...")
+        df_tr_s1 = load_source_tsv(tr_s1_path, max_rows=sample_size)
         s1_keep = set(df_tr_s1["entity_id"])
-        gt_mapping = {k: v for k, v in gt_mapping.items() if k in s1_keep}
+
+        gt_mapping = {}
+        with open(tr_gt_path, "r", encoding="utf-8", errors="replace") as f:
+            next(f)
+            for line in f:
+                s1, _, rest = line.partition("\t")
+                s1 = s1.strip()
+                if s1 in s1_keep:
+                    gt_mapping[s1] = [m.strip() for m in rest.split(",") if m.strip()]
+                    if len(gt_mapping) == len(s1_keep):
+                        break
+
+        needed_s23 = set()
+        for matches in gt_mapping.values():
+            needed_s23.update(matches)
+
+        # Load S2 and S3: target matching records + extra negatives
+        s2_max = max(sample_size * 6, len(needed_s23) * 2)
+        df_tr_s2 = load_source_tsv(tr_s2_path, max_rows=s2_max)
+        df_tr_s3 = load_source_tsv(tr_s3_path, max_rows=s2_max)
+    else:
+        df_tr_s1 = load_source_tsv(tr_s1_path)
+        df_tr_s2 = load_source_tsv(tr_s2_path)
+        df_tr_s3 = load_source_tsv(tr_s3_path)
+        gt_mapping = load_ground_truth_tsv(tr_gt_path)
 
     df_tr_s23 = pd.concat([df_tr_s2, df_tr_s3], ignore_index=True)
     print(f"Loaded {len(df_tr_s1):,} S1, {len(df_tr_s2):,} S2, {len(df_tr_s3):,} S3 records in {time.time()-t0:.2f}s.")

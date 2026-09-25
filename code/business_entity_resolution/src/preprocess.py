@@ -10,7 +10,7 @@ Handles cross-lingual normalization for US, India, and France:
 
 import re
 import unicodedata
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 import pandas as pd
 
 
@@ -117,39 +117,45 @@ def extract_digits(text: str) -> List[str]:
     return re.findall(r"\b\d+\b", text)
 
 
-def load_source_tsv(filepath: str) -> pd.DataFrame:
+def load_source_tsv(
+    filepath: str,
+    max_rows: Optional[int] = None,
+    target_ids: Optional[Set[str]] = None,
+) -> pd.DataFrame:
     """Robust TSV parser for source records.
 
     Handles noisy columns, unescaped quotes, and inconsistent tab separators safely.
-    Expected columns: entity_id, business_name, business_address, country.
+    Supports max_rows and target_ids filtering for low-RAM streaming.
     """
     rows = []
     with open(filepath, "r", encoding="utf-8", errors="replace") as f:
         header_line = f.readline().rstrip("\r\n")
-        header = [c.strip().lower() for c in header_line.split("\t")]
 
         for line_num, line in enumerate(f, start=2):
+            if max_rows and len(rows) >= max_rows:
+                break
             line = line.rstrip("\r\n")
             if not line:
                 continue
             parts = line.split("\t")
+            entity_id = parts[0].strip()
+
+            if target_ids is not None and entity_id not in target_ids:
+                continue
+
             if len(parts) == 4:
-                rows.append(parts)
+                rows.append([entity_id, parts[1].strip(), parts[2].strip(), parts[3].strip()])
             elif len(parts) > 4:
-                # Handle stray tabs inside name/address by keeping first and last fields
-                entity_id = parts[0].strip()
                 country = parts[-1].strip()
-                # If middle parts were split, merge them
                 middle = " ".join(p.strip() for p in parts[1:-1])
-                # Guess business_name as first middle chunk and rest as address
                 sub_parts = middle.split("  ", 1)
                 b_name = sub_parts[0] if sub_parts else middle
                 b_addr = sub_parts[1] if len(sub_parts) > 1 else ""
                 rows.append([entity_id, b_name, b_addr, country])
             elif len(parts) == 3:
-                rows.append([parts[0], parts[1], parts[2], ""])
+                rows.append([entity_id, parts[1].strip(), parts[2].strip(), ""])
             else:
-                rows.append([parts[0], "", "", ""])
+                rows.append([entity_id, "", "", ""])
 
     df = pd.DataFrame(rows, columns=["entity_id", "business_name", "business_address", "country"])
     return preprocess_dataframe(df)
