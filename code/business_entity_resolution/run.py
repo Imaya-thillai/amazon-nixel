@@ -63,7 +63,7 @@ def main():
     parser.add_argument(
         "--max-candidates",
         type=int,
-        default=6,
+        default=4,
         help="Max candidate pairs to retain per Source 1 entity during blocking",
     )
     parser.add_argument(
